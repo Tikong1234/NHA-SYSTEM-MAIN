@@ -3,62 +3,60 @@ session_start();
 include('include/config.php');
 include("include/header.php");
 
+if(isset($_POST['submit'])) {
+    $Fullname = $_POST['Fullname'];
+    $Email = $_POST['Email'];
+    $Username = $_POST['Username'];
+    $password = md5($_POST['password']);
+    $role = "Admin";
+    $default_image = "../uploads/image.jpg"; // Specify the path to the default image
 
-    if(isset($_POST['submit'])) {
-        $Fullname = $_POST['Fullname'];
-        $Email = $_POST['Email'];
-        $Username = $_POST['Username'];
-        $password = md5($_POST['password']);
-        $role = "Admin";
-        // Check if the combination already exists in the database
-        $sql_check = "SELECT * FROM admin WHERE fullname = '$Fullname' AND email = '$Email' AND username = '$Username'";
-        $result_check = mysqli_query($bd, $sql_check);
-        if (mysqli_num_rows($result_check) > 0) {
+    // Check if the combination already exists in the database
+    $sql_check = "SELECT * FROM admin WHERE fullname = '$Fullname' AND email = '$Email' AND username = '$Username'";
+    $result_check = mysqli_query($bd, $sql_check);
+    if (mysqli_num_rows($result_check) > 0) {
+        echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Admin user already exists.",
+                        icon: "error"
+                    });
+                };
+              </script>';
+    } else {
+        // Insert new admin with default image
+        $sql_insert = "INSERT INTO `admin`(`fullname`, `email`, `username`, `password`, `role`, `image`) VALUES ('$Fullname', '$Email', '$Username', '$password', '$role', '$default_image')";
+        $result_insert = mysqli_query($bd, $sql_insert);
+        if ($result_insert) {
             echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "Admin user already exists.",
-                            icon: "error"
-                        });
-                    };
-                  </script>';
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Admin Account Successfully Created !!",
+                        icon: "success"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "index.php";
+                        }
+                    });
+                };
+              </script>';
         } else {
-            // Insert new fiber plan
-            $sql_insert = "INSERT INTO `admin`(`fullname`, `email`, `username`, `password`, `role`) VALUES ('$Fullname', '$Email', '$Username ', '$password', '$role')";
-            $result_insert = mysqli_query($bd, $sql_insert);
-            if ($result_insert) {
-                 echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Success!",
-                            text: "Admin Account Successfully Created !!",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "index.php";
-                            }
-                        });
-                    };
-                  </script>';
-
-            } else {
-                echo '<script>
-                    window.onload = function() {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "Error creating An account.",
-                            icon: "error"
-                        });
-                    };
-                  </script>';
-            }
+            echo '<script>
+                window.onload = function() {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "Error creating An account.",
+                        icon: "error"
+                    });
+                };
+              </script>';
         }
     }
-
-
-
+}
 ?>
+
 
     <style>
      
@@ -101,53 +99,52 @@ include("include/header.php");
     </div>
     <div class="card-body">
 
-      <form action="" method="post">
-        <div class="input-group mb-3">
-          <input type="text" name="Fullname" class="form-control" required placeholder="Fullname">
-          <div class="input-group-append">
+    <form action="" method="post">
+    <div class="input-group mb-3">
+        <input type="text" name="Fullname" class="form-control" required placeholder="Fullname">
+        <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-users"></span>
+                <span class="fas fa-users"></span>
             </div>
-          </div>
         </div>
-        <div class="input-group mb-3">
-          <input type="email" name="Email" class="form-control" required placeholder="Email">
-          <div class="input-group-append">
+    </div>
+    <div class="input-group mb-3">
+        <input type="email" name="Email" class="form-control" required placeholder="Email">
+        <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
+                <span class="fas fa-envelope"></span>
             </div>
-          </div>
         </div>
-        <div class="input-group mb-3">
-          <input type="text" name="Username" class="form-control" required placeholder="Username">
-          <div class="input-group-append">
+    </div>
+    <div class="input-group mb-3">
+        <input type="text" name="Username" class="form-control" required placeholder="Username">
+        <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-users"></span>
+                <span class="fas fa-users"></span>
             </div>
-          </div>
         </div>
-        <div class="input-group mb-3">
-         <div class="input-group">
-                           <input type="password" class="form-control" autocomplete="off" name="password" id="password" placeholder="Password" required>
-                           <div class="input-group-append">
-                               <button class="btn btn-outline-secondary" type="button" id="oldPasswordToggle">
-                               <i class="fas fa-eye toggle-icon"></i>
-                               </button>
-                           </div>
-                       </div>        </div>
-        <div class="row">
-          <div class="col-8">
+    </div>
+    <div class="input-group mb-3">
+        <div class="input-group">
+            <input type="password" class="form-control" autocomplete="off" name="password" id="password" placeholder="Password" required>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="oldPasswordToggle">
+                    <i class="fas fa-eye toggle-icon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-8">
             <div class="icheck-primary">
-            <a href="index.php" class="text-center">Already Have an Account?</a>
+                <a href="index.php" class="text-center">Already Have an Account?</a>
             </div>
-          </div>
-          <!-- /.col -->
-          <div class="col-4">
-            <button type="submit" name="submit" class="btn btn-primary btn-block" style="background-color: #9900ff; border-radius: 10px;">Sign Up</button>
-          </div>
-          <!-- /.col -->
         </div>
-      </form>
+        <div class="col-4">
+            <button type="submit" name="submit" class="btn btn-primary btn-block" style="background-color: #9900ff; border-radius: 10px;">Sign Up</button>
+        </div>
+    </div>
+</form>
 
       <!-- /.social-auth-links -->
 

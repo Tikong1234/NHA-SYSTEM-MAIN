@@ -2,62 +2,82 @@
 session_start();
 include('include/config.php');
 include("include/header.php");
-
-if (strlen($_SESSION['alogin']) == 0) { 
+if (strlen($_SESSION['alogin']) == 0) {
     header('location:index.php');
-    exit();
 } else {
-    date_default_timezone_set('Asia/Manila');
+    date_default_timezone_set('Asia/Manila'); // change according timezone
     $currentTime = date('d-m-Y h:i:s A', time());
-    $status = 'Unoccupied';
+    $noti = "We have a new client named "; // Corrected the notification message
+    $stat = "Unread";
+    $description = "Details : ";
+    // $main_id=intval($_GET['main_id']);
 
-    if (isset($_GET['del'])) {
-        $id = $_GET['id'];
+    if (isset($_POST['submit'])) {
+        $block_number = $_POST['block_number'];
+        $lot_number = $_POST['lot_number'];
+                
 
-        // Fetch the profile to be deleted
-        $query = mysqli_query($bd, "SELECT * FROM profiling WHERE id = '$id'");
+        // Check if the combination of location, box number, and port number already exists
+        $sql = "SELECT * FROM block_lot WHERE block_number = '$block_number' AND lot_number = '$lot_number' ";
+        $result = mysqli_query($bd, $sql);
+        if (mysqli_num_rows($result) > 0) {
+            // If the combination exists, display an error message
+               echo '<script>
+                    window.onload = function() {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Block Number and Lot Number already Exist!",
+                            icon: "error"
+                        });
+                    };
+                  </script>';
+        }   else {
+           
 
-        if ($query) {
-            $row = mysqli_fetch_array($query);
-            if ($row) {
-                // Get block and lot numbers
-                $block_number = $row['block_number'];
-                $lot_number = $row['lot_number'];
 
-                // Delete the profile
-                mysqli_query($bd, "DELETE FROM profiling WHERE id = '$id'");
+                $status='Unoccupied';
 
-                // Update the block_lot status
-                $sql2 = "UPDATE block_lot SET status = ? WHERE block_number = ? AND lot_number = ?";
-                $stmt2 = $bd->prepare($sql2);
-                $stmt2->bind_param('sss', $status, $block_number, $lot_number);
-                $stmt2->execute();
+                // If the combination doesn't exist and the client doesn't exist, insert the new client
+                $sql = "INSERT INTO `block_lot`(`block_number`, `lot_number`, `status`) VALUES ('$block_number','$lot_number','$status')";
 
+
+
+                //   $sql3 = mysqli_query($bd, "INSERT INTO notifications (clients_id,clientname, message, agents_id, agentsname,address,description,status) VALUES ('$clients_id','$clientsname','$noti','$agents_id',' $agentsname ','$Municipality $location_address $sitio_address',' $description $email $contactNo $net_plan ','$stat')");
+
+                //   $sql001 = mysqli_query($bd, "INSERT INTO notificationsadmin (clients_id,clientname, message, agents_id, agentsname,address,description,status) VALUES ('$clients_id','$clientsname','$noti','$agents_id',' $agentsname ','$Municipality $location_address $sitio_address',' $description $email $contactNo $net_plan ','$stat')");
+
+                $result = mysqli_query($bd, $sql);
+                if ($result) {
+                // JavaScript code to show SweetAlert message
                 echo '<script>
                     window.onload = function() {
                         Swal.fire({
                             title: "Success!",
-                            text: "User Data Successfully deleted!!",
+                            text: " Block and Lot Successfully Created !!",
                             icon: "success"
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = "profiling.php";
+                                window.location.href = "unoccupied.php";
                             }
                         });
                     };
                   </script>';
-            } else {
-                // Handle case when no row is fetched
-                $_SESSION['erroMsg'] = "Error: No data found for deletion.";
-            }
         } else {
-            // Handle case when query execution fails
-            $_SESSION['erroMsg'] = "Error: Failed to execute query.";
+            echo '<script>
+                    window.onload = function() {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Error occurred while creating client.",
+                            icon: "error"
+                        });
+                    };
+                  </script>';
+            echo "Error: " . $sql . "<br>" . mysqli_error($bd);
+        }
+            }
         }
     }
-}
 ?>
-
   <style type="text/css">
 
       .unread {
@@ -96,14 +116,10 @@ if (strlen($_SESSION['alogin']) == 0) {
 
 <body class="animsition">
     <div class="page-wrapper">
-       <?php include 'include/mobile.php';?>
+        <?php include 'include/mobile.php'; ?>
+        <?php include 'include/sidebar.php'; ?>
 
-        <!-- MENU SIDEBAR-->
-       <?php include 'include/sidebar.php'; ?>
-        <!-- END MENU SIDEBAR-->
-
-      
-            <!-- HEADER DESKTOP-->
+       
 
             <!-- MAIN CONTENT-->
             <div class="main-content">
@@ -112,75 +128,48 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="row">
                                <div class="card"style="width: 104%;">
               <div class="card-header">
-                <h3 class="card-title">Profiling</h3>
+                <h3 class="card-title">Add Block and Lot Number</h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <div class="controls" style="margin-top: 5px;">
-                 <button class="btn-sm btn-success" type="button" onclick="location.href='add_profile.php'"><i class="fa fa-plus"></i> New </button> 
+                         
                       
                     </div>
+                    <form action="" method="post" enctype="multipart/form-data">
+        <div class="row">
+         <div class="col-md-6">
 
-                    <br>
+         <div class="form-group">
+           <label for="agents" class="control-label">Block Number</label>
+           <input type="text" class="form-control" autocomplete="off" name="block_number" class="span8 tip" autocomplete="off" placeholder="Block Number" required>
+        </div>  
+      </div>
+      
+      <div class="col-md-6">
+            <div class="form-group">
+                        <label for="">Lot Number</label>
+                      <input type="text" class="form-control"  name="lot_number" placeholder="Lot Number" class="span8 tip" required>
+                       
+                        
 
-                <table id="example2"  class="table table-bordered table-striped">
-
-                   <thead>
-                 <tr>
-               <th>#</th>
-                <th>BLOCK NUMBER</th>
-                <th>LOT NUMBER</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
-                <th>MIDDLE NAME</th>
-                <th>GENDER</th>
-                <th>BARANGAY</th>
-                <th>REMARKS</th>
-                <th>Action</th>     
-               </tr> 
-                  </thead>
-                  <tbody>
-               <?php 
-               $cnt=1;
-                   $query=mysqli_query($bd,"select * from profiling ORDER BY block_number");
-                   while($row=mysqli_fetch_array($query))
-              {
-                ?>  
-                  <tr>
-                     <td><?php echo htmlentities($cnt);?></td>
-                    <td><?php echo htmlentities($row['block_number']);?></td>
-                    <td><?php echo htmlentities($row['lot_number']);?></td>
-                    <td><?php echo htmlentities($row['lastname']);?></td>
-                    <td><?php echo htmlentities($row['firstname']);?></td>
-                    <td><?php echo htmlentities($row['middlename']);?></td>
-                    <td><?php echo htmlentities($row['gender']);?></td>
-                    <td><?php echo htmlentities($row['barangay']);?></td>
-                    <td><?php echo htmlentities($row['remarks']);?></td> 
-          
-                 <td class="text-center">
-         <!--  <a class="btn-sm btn-primary" style="margin : 5px" href="list-internetplan.php?id=<?php echo $row['id']?>&del=delete"><i class="fa fa-trash"></i> Edit</a> -->
-        
-         <button type="button" class="btn btn-default btn-sm btn-flat border-info wave-effect text-info dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Action</button>
-                                  <div class="dropdown-menu" role="menu">
-                                  <div class="dropdown-divider"></div>
-                                     <a class="dropdown-item edit_data" href="view-profile.php?id=<?php echo $row['id']?>" ><span class="fa fa-eye text-primary"></span>view</a>
-                                    <div class="dropdown-divider"></div>
-                                    <div class="dropdown-divider"></div>
-                                     <a class="dropdown-item edit_data" href="edit-profiling.php?id=<?php echo $row['id']?>" ><span class="fa fa-edit text-primary"></span> Edit</a>
-                                    <div class="dropdown-divider"></div>
-                                   <a class="dropdown-item delete_data" href="profiling.php?id=<?php echo $row['id']?>&del=delete"><span class="fa fa-trash text-danger"></span> Delete</a>
-                                  </div>
- 
-        </td>
-          </tr>
-          <?php $cnt=$cnt+1; } ?>
-                  </tbody>
-                 
+         
+        </div>
+      </div>
+    </div> 
+      
+             
+            
               
-
-                
-                  
-                </table>
+         
+             <button type="submit" name="submit" class="btn btn-success">Create</button>
+             <button class="btn btn-secondary" type="button" onclick="location.href='unoccupied.php'">Cancel</button>
+             </div>
+         </div>
+         <br>
+         <br> 
+      </div>
+      </form> 
               </div>
               <!-- /.card-body -->
             </div>
@@ -198,7 +187,7 @@ if (strlen($_SESSION['alogin']) == 0) {
             <!-- END MAIN CONTENT-->
             <!-- END PAGE CONTAINER-->
         </div>
-        <?php include 'include/footer.php' ?>
+
     </div>
    <script>
     function logout() {
@@ -270,8 +259,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
-</script>
-
+<?php include 'include/footer.php' ?>
 <script>
   $(function () {
     $("#example1").DataTable({

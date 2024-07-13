@@ -88,28 +88,7 @@ if (strlen($_SESSION['alogin']) == 0) {
        <?php include 'include/sidebar.php'; ?>
         <!-- END MENU SIDEBAR-->
 
-        <!-- PAGE CONTAINER-->
-        <div class="page-container">
-            <!-- HEADER DESKTOP-->
-           <header class="header-desktop">
-    <div class="section__content section__content--p30">
-        <div class="container-fluid">
-            <div class="header-wrap">
-                <form class="form-header" action="" method="POST">
-                    <input class="au-input au-input--xl" type="text" name="search" placeholder="Search" />
-                    <button class="au-btn--submit" type="submit">
-                        <i class="zmdi zmdi-search"></i>
-                    </button>
-                </form>
-                <div class="header-button" style="display: flex; justify-content: center; align-items: center; width: 100%;">
-               <div class="noti__item js-item-menu" style="margin: 0 auto;">
-    <i class="zmdi zmdi-notifications"></i>
-    
-        <div class="notifi__footer">
-            <a href="appoint.php">View All notifications</a>
-        </div>
-    </div>
-</div>
+        
 
 
 
@@ -118,45 +97,6 @@ if (strlen($_SESSION['alogin']) == 0) {
 
 
 
-
-                    <div class="account-wrap">
-                                             <?php
-                                          
-                                             $query=mysqli_query($bd, "select * from admin");
-                                             $data = mysqli_fetch_assoc($query);
-                                             ?>  
-                        <div class="account-item clearfix js-item-menu">
-                            <div class="content">
-                                <a class="js-acc-btn" href="#">My Profile</a>
-                            </div>
-                            <div class="account-dropdown js-dropdown">
-                              
-                                <div class="account-dropdown__body">
-                                    <div class="account-dropdown__item">
-                                    <div class="account-dropdown__item">
-                                        <a> <strong>Fullname</strong><br>
-                                            <?php echo $data['fullname'] ?></a>
-                                    </div>
-                                     <div class="account-dropdown__item">
-                                        <a ><strong>Email</strong><br>
-                                            <?php echo $data['email'] ?></a>
-                                    </div>
-                                     <div class="account-dropdown__item">
-                                        <a ><strong>Address</strong><br>
-                                            <?php echo $data['address'] ?></a>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
-
-            <!-- HEADER DESKTOP-->
             <!-- HEADER DESKTOP-->
 
             <!-- MAIN CONTENT-->

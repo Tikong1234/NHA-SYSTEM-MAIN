@@ -5,94 +5,86 @@ include("include/header.php");
 
 if (strlen($_SESSION['alogin']) == 0) {
     header('location:index.php');
-    exit();
-}
+} else {
+    date_default_timezone_set('Asia/Manila'); // change according timezone
+    $currentTime = date('d-m-Y h:i:s A', time());
+    $noti = "We have a new client named "; // Corrected the notification message
+    $stat = "Unread";
+    $description = "Details : ";
 
-date_default_timezone_set('Asia/Manila'); // Set timezone
-$currentTime = date('d-m-Y h:i:s A', time());
-$notification = "We have a new client named "; // Corrected the notification message
-$statusUnread = "Unread";
-$description = "Details : ";
+    if (isset($_POST['submit'])) {
+        $block_number = $_POST['block_number'];
+        $lot_number = $_POST['lot_number'];
+        $lastname = $_POST['lastname'];
+        $firstname = $_POST['firstname'];
+        $middlename = $_POST['middlename'];
+        $gender = $_POST['gender'];
+        $barangay = $_POST['barangay'];
+        $remarks = $_POST['remarks'];
+        $status = 'Occupied';
 
-if (isset($_POST['submit'])) {
-    $block_number = $_POST['block_number'];
-    $lot_number = $_POST['lot_number'];
-    $lastname = $_POST['lastname'];
-    $firstname = $_POST['firstname'];
-    $middlename = $_POST['middlename'];
-    $gender = $_POST['gender'];
-    $barangay = $_POST['barangay'];
-    $remarks = $_POST['remarks'];
-    $civil_status = $_POST['civil_status'];
-    $spouse = $_POST['spouse'];
-    $family_member = $_POST['family_member'];
-    $occupation = $_POST['occupation'];
-    $contact = $_POST['contact'];
-    $place_of_birth = $_POST['place_of_birth'];
-    $status ='Occupied';
+        // Check if the client with the same name already exists
+        $sql = "SELECT * FROM profiling WHERE lastname = ? AND firstname = ? AND middlename = ?";
+        $stmt = $bd->prepare($sql);
+        $stmt->bind_param('sss', $lastname, $firstname, $middlename);
+        $stmt->execute();
+        $stmt->store_result();
 
-    // Check if the client with the same name already exists
-    $sql = "SELECT * FROM profiling WHERE lastname = ? AND firstname = ? AND middlename = ?";
-    $stmt = $bd->prepare($sql);
-    $stmt->bind_param('sss', $lastname, $firstname, $middlename);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        echo '<script>
-            window.onload = function() {
-                Swal.fire({
-                    title: "Error!",
-                    text: "The credentials you entered already exist with a different block number and lot number.",
-                    icon: "error"
-                });
-            };
-        </script>';
-    } else {
-        // Insert the new client into profiling
-        $sql1 = "INSERT INTO profiling (block_number, lot_number, lastname, firstname, middlename, gender, barangay, remarks, civil_status, spouse, family_member,occupation, contact, place_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt1 = $bd->prepare($sql1);
-        $stmt1->bind_param('ssssssssssssss', $block_number, $lot_number, $lastname, $firstname, $middlename, $gender, $barangay, $remarks, $civil_status, $spouse, $family_member, $occupation, $contact, $place_of_birth);
-
-        // Update the status of the block and lot in block_lot
-        $sql2 = "UPDATE block_lot SET status = ? WHERE block_number = ? AND lot_number = ?";
-        $stmt2 = $bd->prepare($sql2);
-        $stmt2->bind_param('sss', $status, $block_number, $lot_number);
-
-        if ($stmt1->execute() && $stmt2->execute()) {
-            echo '<script>
-                window.onload = function() {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Data Successfully Created!!",
-                        icon: "success"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "profiling.php";
-                        }
-                    });
-                };
-            </script>';
-        } else {
+        if ($stmt->num_rows > 0) {
             echo '<script>
                 window.onload = function() {
                     Swal.fire({
                         title: "Error!",
-                        text: "Error occurred while creating client.",
+                        text: "The credentials you entered already exist with a different block number and lot number",
                         icon: "error"
                     });
                 };
-            </script>';
-            echo "Error: " . $stmt1->error . "<br>" . $stmt2->error;
-        }
+              </script>';
+        } else {
+            // Insert the new client into profiling
+            $sql1 = "INSERT INTO profiling (block_number, lot_number, lastname, firstname, middlename, gender, barangay, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt1 = $bd->prepare($sql1);
+            $stmt1->bind_param('ssssssss', $block_number, $lot_number, $lastname, $firstname, $middlename, $gender, $barangay, $remarks);
 
-        $stmt1->close();
-        $stmt2->close();
+            // Update the status of the block and lot in block_lot
+            $sql2 = "UPDATE block_lot SET status = ? WHERE block_number = ? AND lot_number = ?";
+            $stmt2 = $bd->prepare($sql2);
+            $stmt2->bind_param('sss', $status, $block_number, $lot_number);
+
+            if ($stmt1->execute() && $stmt2->execute()) {
+                echo '<script>
+                    window.onload = function() {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Data Successfully Created!!",
+                            icon: "success"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "profiling.php";
+                            }
+                        });
+                    };
+                  </script>';
+            } else {
+                echo '<script>
+                    window.onload = function() {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Error occurred while creating client.",
+                            icon: "error"
+                        });
+                    };
+                  </script>';
+                echo "Error: " . $stmt1->error . "<br>" . $stmt2->error;
+            }
+
+            $stmt1->close();
+            $stmt2->close();
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 ?>
-
 
   <style type="text/css">
 
@@ -135,7 +127,26 @@ if (isset($_POST['submit'])) {
         <?php include 'include/mobile.php'; ?>
         <?php include 'include/sidebar.php'; ?>
 
-       
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+            <!-- HEADER DESKTOP-->
+            <header class="header-desktop">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="header-wrap">
+                            <form class="form-header" action="" method="POST">
+                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search" />
+                                <button class="au-btn--submit" type="submit">
+                                    <i class="zmdi zmdi-search"></i>
+                                </button>
+                            </form>
+                            <div class="header-button">
+                               
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- HEADER DESKTOP-->
 
             <!-- MAIN CONTENT-->
             <div class="main-content">
@@ -245,60 +256,12 @@ if (isset($_POST['submit'])) {
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label for="remarks" class="control-label">Place of Birth</label>
-                <input type="text" class="form-control" name="place_of_birth" placeholder="Place of Birth" required>
+                <label for="remarks" class="control-label">Remarks</label>
+                <input type="text" class="form-control" name="remarks" placeholder="Remarks" required>
             </div>
         </div>
     </div>
-    <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="civil_status" class="control-label">Civil Status</label>
-                             <select class="form-control" name="civil_status" required>
-                                 <option value="">Select</option>
-                                 <option value="Single">Single</option>
-                                 <option value="Married">Married</option>
-                                 <option value="Separated">Separated</option>
-                                 <option value="Divorced">Divorced</option>
-                                 <option value="Widowed">Widowed</option>
-                             </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="">Spouse Name</label>
-                            <input type="text" class="form-control" name="spouse" placeholder="Spouse Name">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label">Family Member</label>
-                            <input type="number" class="form-control" autocomplete="off" name="family_member" placeholder="Family Member" required min="0">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label">Occupation</label>
-                            <input type="text" class="form-control" name="occupation" placeholder="Occupation">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                <div class="col-md-6">
-                <div class="form-group">
-                 <label for="contact" class="control-label">Contact</label>
-                 <input type="text" class="form-control" name="contact" id="contact" placeholder="Contact" maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits">
-                 </div>
-                </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="" class="control-label">Remarks</label>
-                            <input type="text" class="form-control" name="remarks" placeholder="Remarks" required>
-                        </div>
-                    </div>
-                </div>
+
     <button type="submit" name="submit" class="btn btn-success">Create</button>
     <button class="btn btn-secondary" type="button" onclick="location.href='profiling.php'">Cancel</button>
 </form>
@@ -322,29 +285,6 @@ if (isset($_POST['submit'])) {
         </div>
 
     </div>
-    <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const familyMemberInput = document.querySelector('input[name="family_member"]');
-
-    familyMemberInput.addEventListener('input', function() {
-        if (this.value < 0) {
-            this.value = '';
-            Swal.fire({
-            title: "Warning",
-            text: "Negative numbers are not allowed.",
-            icon: "warning",
-            confirmButtonText: "Ok"
-       });
-        }
-    });
-});
-</script>
-
-    <script>
-    document.getElementById('contact').addEventListener('input', function (e) {
-        this.value = this.value.replace(/\D/g, ''); // Remove non-digit characters
-    });
-</script>
     <script>
 document.getElementById('block_number').addEventListener('change', function() {
     var blockNumber = this.value;

@@ -5,44 +5,29 @@ include("include/header.php");
 
 if (strlen($_SESSION['alogin']) == 0) { 
     header('location:index.php');
-    exit();
 } else {
     date_default_timezone_set('Asia/Manila');
     $currentTime = date('d-m-Y h:i:s A', time());
-    $status = 'Unoccupied';
+  
 
     if (isset($_GET['del'])) {
-        $id = $_GET['id'];
+         $query = mysqli_query($bd, "SELECT * FROM profiling");
+    if ($query) {
+        $row = mysqli_fetch_array($query);  
+        if ($row) {
+         
+           
+    
+         
 
-        // Fetch the profile to be deleted
-        $query = mysqli_query($bd, "SELECT * FROM profiling WHERE id = '$id'");
-
-        if ($query) {
-            $row = mysqli_fetch_array($query);
-            if ($row) {
-                // Get block and lot numbers
-                $block_number = $row['block_number'];
-                $lot_number = $row['lot_number'];
-
-                // Delete the profile
-                mysqli_query($bd, "DELETE FROM profiling WHERE id = '$id'");
-
-                // Update the block_lot status
-                $sql2 = "UPDATE block_lot SET status = ? WHERE block_number = ? AND lot_number = ?";
-                $stmt2 = $bd->prepare($sql2);
-                $stmt2->bind_param('sss', $status, $block_number, $lot_number);
-                $stmt2->execute();
-
-                echo '<script>
+                mysqli_query($bd, "DELETE FROM profiling WHERE id = '".$_GET['id']."'");
+               
+                  echo '<script>
                     window.onload = function() {
                         Swal.fire({
                             title: "Success!",
-                            text: "User Data Successfully deleted!!",
+                            text: "User Data Successfully deleted !!",
                             icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "profiling.php";
-                            }
                         });
                     };
                   </script>';
@@ -57,7 +42,6 @@ if (strlen($_SESSION['alogin']) == 0) {
     }
 }
 ?>
-
   <style type="text/css">
 
       .unread {
@@ -102,7 +86,6 @@ if (strlen($_SESSION['alogin']) == 0) {
        <?php include 'include/sidebar.php'; ?>
         <!-- END MENU SIDEBAR-->
 
-      
             <!-- HEADER DESKTOP-->
 
             <!-- MAIN CONTENT-->
@@ -112,12 +95,12 @@ if (strlen($_SESSION['alogin']) == 0) {
                         <div class="row">
                                <div class="card"style="width: 104%;">
               <div class="card-header">
-                <h3 class="card-title">Profiling</h3>
+                <h3 class="card-title">Occupied Blocks And Lot</h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <div class="controls" style="margin-top: 5px;">
-                 <button class="btn-sm btn-success" type="button" onclick="location.href='add_profile.php'"><i class="fa fa-plus"></i> New </button> 
+                 <button class="btn-sm btn-success" type="button" onclick="location.href='add-blocklot.php'"><i class="fa fa-plus"></i> New </button> 
                       
                     </div>
 
@@ -130,19 +113,14 @@ if (strlen($_SESSION['alogin']) == 0) {
                <th>#</th>
                 <th>BLOCK NUMBER</th>
                 <th>LOT NUMBER</th>
-                <th>LAST NAME</th>
-                <th>FIRST NAME</th>
-                <th>MIDDLE NAME</th>
-                <th>GENDER</th>
-                <th>BARANGAY</th>
-                <th>REMARKS</th>
                 <th>Action</th>     
                </tr> 
                   </thead>
                   <tbody>
                <?php 
                $cnt=1;
-                   $query=mysqli_query($bd,"select * from profiling ORDER BY block_number");
+               $status ='Occupied';
+                   $query=mysqli_query($bd,"select * from block_lot WHERE status='$status'");
                    while($row=mysqli_fetch_array($query))
               {
                 ?>  
@@ -150,26 +128,16 @@ if (strlen($_SESSION['alogin']) == 0) {
                      <td><?php echo htmlentities($cnt);?></td>
                     <td><?php echo htmlentities($row['block_number']);?></td>
                     <td><?php echo htmlentities($row['lot_number']);?></td>
-                    <td><?php echo htmlentities($row['lastname']);?></td>
-                    <td><?php echo htmlentities($row['firstname']);?></td>
-                    <td><?php echo htmlentities($row['middlename']);?></td>
-                    <td><?php echo htmlentities($row['gender']);?></td>
-                    <td><?php echo htmlentities($row['barangay']);?></td>
-                    <td><?php echo htmlentities($row['remarks']);?></td> 
+                   
           
                  <td class="text-center">
          <!--  <a class="btn-sm btn-primary" style="margin : 5px" href="list-internetplan.php?id=<?php echo $row['id']?>&del=delete"><i class="fa fa-trash"></i> Edit</a> -->
         
          <button type="button" class="btn btn-default btn-sm btn-flat border-info wave-effect text-info dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Action</button>
                                   <div class="dropdown-menu" role="menu">
-                                  <div class="dropdown-divider"></div>
-                                     <a class="dropdown-item edit_data" href="view-profile.php?id=<?php echo $row['id']?>" ><span class="fa fa-eye text-primary"></span>view</a>
                                     <div class="dropdown-divider"></div>
-                                    <div class="dropdown-divider"></div>
-                                     <a class="dropdown-item edit_data" href="edit-profiling.php?id=<?php echo $row['id']?>" ><span class="fa fa-edit text-primary"></span> Edit</a>
-                                    <div class="dropdown-divider"></div>
-                                   <a class="dropdown-item delete_data" href="profiling.php?id=<?php echo $row['id']?>&del=delete"><span class="fa fa-trash text-danger"></span> Delete</a>
-                                  </div>
+                                     <a class="dropdown-item edit_data" href="view-profile.php?id=<?php echo $row['id']?>" ><span class="fa fa-edit text-primary"></span> Edit</a>
+                                   
  
         </td>
           </tr>
@@ -271,7 +239,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
-
 <script>
   $(function () {
     $("#example1").DataTable({

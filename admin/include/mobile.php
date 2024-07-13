@@ -24,45 +24,21 @@
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
                         <li>
-                             <?php include 'include/config.php';
-                                $rt = mysqli_query($bd, "SELECT * FROM profiling");
-                                $num1 = mysqli_num_rows($rt);
-                                ?>
+                             
                             <a href="profiling.php">
-                                <i class="fas fa-user"></i>Profiling &nbsp;<span class="badge badge-info"><?php echo htmlentities($num1); ?></a>
+                                <i class="fas fa-user"></i>Profiling &nbsp;<span class="badge badge-info"></a>
                         </li>
+                       
+                        <!-- <li> -->
+                            
+                            <!-- <a href="occupied.php"> -->
+                                <!-- <i class="fas fa-home"></i>Occupied Block & Lot &nbsp;<span class="badge badge-success"></a> -->
+                        <!-- </li> -->
 
                         <li>
-                             <?php include 'include/config.php';
-                             $status="Approved";                   
-                             $rt = mysqli_query($bd, "SELECT * FROM profiling");
-                             $num1 = mysqli_num_rows($rt);
-                            ?>
-                            <a href="consul.php">
-                                <i class="fas fa-home"></i>Occupied House &nbsp;<span class="badge badge-success"><?php echo htmlentities($num1); ?></a>
-                        </li>
-
-                        <li>
-                             <?php include 'include/config.php';
-                             $status="Pending";                   
-                             $rt = mysqli_query($bd, "SELECT * FROM profiling");
-                             $num1 = mysqli_num_rows($rt);
-                            ?>
-                            <a href="appoint.php">
-                                <i class="fas fa-home"></i>Unoccupied House &nbsp;&nbsp;<span class="badge badge-danger"><?php echo htmlentities($num1); ?></a>
-                        </li>
-                         <li>
-                             <?php include 'include/config.php';
-                                $rt = mysqli_query($bd, "SELECT * FROM admin");
-                                $num1 = mysqli_num_rows($rt);
-                                ?>
-                            <a href="useracc.php">
-                                <i class="zmdi zmdi-account"></i>User Account&nbsp;<span class="badge badge-info"><?php echo htmlentities($num1); ?></a>
-                        </li>
-                          <li>
-                                <a href="index.php">
-
-                                <i class="zmdi zmdi-power"></i>Logout</a>
+                             
+                            <a href="unoccupied.php">
+                                <i class="fas fa-home"></i>Unoccupied Block & Lot &nbsp;&nbsp;<span class="badge badge-danger"></a>
                         </li>
                     </ul>
                 </div>

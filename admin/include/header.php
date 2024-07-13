@@ -28,6 +28,12 @@
             margin-left: 33%;
 
         }
+        #dash{
+           font-size: 12px;
+        }
+        .form-container {
+            margin: 20px 0;
+        }
     </style>
 </head>
 

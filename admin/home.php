@@ -47,26 +47,7 @@ $currentTime2 = date( ' h:i:s A', time () );
         <?php include 'include/sidebar.php'; ?>
         <!-- END MENU SIDEBAR-->
 
-        <!-- PAGE CONTAINER-->
-        <div class="page-container">
-            <!-- HEADER DESKTOP-->
-            <header class="header-desktop">
-                <div class="section__content section__content--p30">
-                    <div class="container-fluid">
-                        <div class="header-wrap">
-                            <form class="form-header" action="" method="POST">
-                                <input class="au-input au-input--xl" type="text" name="search" placeholder="Search" />
-                                <button class="au-btn--submit" type="submit">
-                                    <i class="zmdi zmdi-search"></i>
-                                </button>
-                            </form>
-                            <div class="header-button">
-                               
-                        </div>
-                    </div>
-                </div>
-            </header>
-            <!-- HEADER DESKTOP-->
+       
 
             <!-- MAIN CONTENT-->
             <div class="main-content">
@@ -106,12 +87,12 @@ $currentTime2 = date( ' h:i:s A', time () );
                                             </div>
                                             <div class="text">
                                                 <?php include 'include/config.php';
-                                                 $status="Approved";                   
-                                                 $rt = mysqli_query($bd, "SELECT * FROM profiling");
+                                                 $status="Occupied";                   
+                                                 $rt = mysqli_query($bd, "SELECT * FROM block_lot WHERE status='$status'");
                                                  $num1 = mysqli_num_rows($rt);
                                                 ?>
                                               
-                                                 <span><h4><a href="#"style="color:white;"><?php echo htmlentities($num1); ?><br>Total Blocks</a></h4></span>
+                                                 <span><h4><a href="occupied.php"style="color:white;"><?php echo htmlentities($num1); ?><br>Occupied</a></h4></span>
                                             </div>
                                         </div>
                                         <div class="overview-chart">
@@ -129,11 +110,11 @@ $currentTime2 = date( ' h:i:s A', time () );
                                             </div>
                                             <div class="text">
                                                 <?php include 'include/config.php';
-                                                  $status="Pending";                   
-                                                  $rt = mysqli_query($bd, "SELECT * FROM profiling ");
+                                                  $status="Unoccupied";                   
+                                                  $rt = mysqli_query($bd, "SELECT * FROM block_lot WHERE status ='$status' ");
                                                   $num1 = mysqli_num_rows($rt);
                                                  ?>
-                                                <span><h4><a href="#"style="color:white;"><?php echo htmlentities($num1); ?><br>Total lots</a></h4></span>
+                                                <span><h4><a href="unoccupied.php"style="color:white;"><?php echo htmlentities($num1); ?><br>Unoccupied</a></h4></span>
                                             </div>
                                         </div>
                                         <div class="overview-chart">
@@ -168,7 +149,7 @@ $currentTime2 = date( ' h:i:s A', time () );
                             <div class="col-lg-6">
                                 <div class="au-card recent-report">
                                     <div class="au-card-inner">
-                                        <h3 class="title-2">recent reports</h3>
+                                        <h3 class="title-2">Total Population</h3>
                                         <div class="chart-info">
                                             <div class="chart-info__left">
                                                 <div class="chart-note">
